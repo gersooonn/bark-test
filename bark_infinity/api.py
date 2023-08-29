@@ -497,19 +497,24 @@ def determine_output_filename(special_one_off_path=None, **kwargs):
 
 
 def write_one_segment(audio_arr=None, full_generation=None, **kwargs):
+    segment_number = kwargs.get("segment_number", "final")  # Obtenha o número do segmento
     filepath = determine_output_filename(**kwargs)
-    # print(f"Looks like filepath is {filepath} is okay?")
+    
+    # Adicione o número do segmento ao nome do arquivo
+    filepath_with_segment = f"{segment_number}_{filepath}"
+
+    # Resto do código para processar e salvar o áudio
     if full_generation is not None:
-        write_seg_npz(filepath, full_generation, **kwargs)
-    if audio_arr is not None and kwargs.get("segment_number", 1) != "base_history":
-        write_seg_wav(filepath, audio_arr, **kwargs)
+        write_seg_npz(filepath_with_segment, full_generation, **kwargs)
+    if audio_arr is not None and segment_number != "base_history":
+        write_seg_wav(filepath_with_segment, audio_arr, **kwargs)
 
     hoarder_mode = kwargs.get("hoarder_mode", False)
     dry_run = kwargs.get("dry_run", False)
-    # if hoarder_mode and not dry_run:
     if not dry_run:
-        log_params(f"{filepath}_info.txt", **kwargs)
-    return filepath
+        log_params(f"{filepath_with_segment}_info.txt", **kwargs)
+    return filepath_with_segment
+
 
 
 def generate_unique_dirpath(dirpath):
